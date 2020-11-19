@@ -105,12 +105,13 @@ function onEditAuth (event) {
     // Killswitch in settings sheet to disable script
     if (settings.getRange("B2").getValue() != true) {
       return;
+    } else { 
+      showSidebar(team_number);
     }
-    showSidebar(team_number);
   }
   
   // Autosort (cell in B4:B is edited)
-  else if (event_range.getColumn() == 2 && event_range.getRow() > 3) {
+  if (event_range.getColumn() == 2 && event_range.getRow() > 3) {
     // Killswitch in settings sheet to disable script
     if (settings.getRange("C2").getValue() != true) {
       return;
@@ -118,7 +119,7 @@ function onEditAuth (event) {
     
     // DNP (do not pick) team
     // To mark a team as DNP (do not pick), replace draft order number with "D" or "d"
-    if (event_range.getValue() == "d" || event_range.getValue() == "D") {
+    else if (event_range.getValue() == "d" || event_range.getValue() == "D") {
       if (sheet.getSheetName() == "Picklist") {
         moveToDnp(event_range, sheet);
       } else {
@@ -134,6 +135,10 @@ function onEditAuth (event) {
     numberDraftOrder(sheet.getRange(4, 2, sheet.getLastRow()-3, 1));
     sheet.getRange("A3").setValue(next_team);
     // Shows sidebar of next team
+    // Killswitch in settings sheet to disable script
+    if (settings.getRange("B2").getValue() != true) {
+      return;
+    }
     showSidebar(next_team);
   }
 }
