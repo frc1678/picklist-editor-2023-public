@@ -1,0 +1,91 @@
+<!-- Copyright (c) 2022 FRC 1678 Citrus Circuits -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- blank target opens link in a separate window -->
+    <base target="_blank" />
+    <?!= include("style"); ?>
+</head>
+
+<body>
+    <table id="headerTable">
+        <tr>
+            <td><a id="previous">&#60;</a></td>
+            <td>
+                <a href="https://www.thebluealliance.com/team/<?!= team_number ?>/2022">
+                    <h1 id="teamNumber">
+                        <?!= team_number ?>
+                    </h1>
+                </a>
+            </td>
+            <td><a id="next">&#62;</a></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <p id="teamName">
+                    <?!= team_name ?>
+                </p>
+            </td>
+        </tr>
+    </table>
+    <a id="imgLink"><img id="image" /></a>
+</body>
+
+<script>
+    var currentImage = 0;
+    var images = [];
+
+    function nextImage() {
+        currentImage++;
+        // previousImage arrow is enabled when nextImage arrow is clicked
+        document.getElementById("previous").setAttribute("onclick", "previousImage()");
+        document.getElementById("previous").style.color = "black";
+        document.getElementById("previous").style.cursor = "pointer";
+
+        if (currentImage == images.length - 1) {
+            document.getElementById("next").removeAttribute("onclick");
+            document.getElementById("next").style.color = "lightgray";
+            // nextImage arrow is disabled if last image is being displayed ("default" means disabled)
+            document.getElementById("next").style.cursor = "default";
+        }
+        document.getElementById("imgLink").setAttribute("href", images[currentImage]);
+        document.getElementById("image").setAttribute("src", images[currentImage]);
+    }
+
+    function previousImage() {
+        currentImage--;
+        // nextImage arrow is enabled when previousImage arrow is clicked
+        document.getElementById("next").setAttribute("onclick", "nextImage()");
+        document.getElementById("next").style.color = "black";
+        document.getElementById("next").style.cursor = "pointer";
+
+        if (currentImage == 0) {
+            document.getElementById("previous").removeAttribute("onclick");
+            document.getElementById("previous").style.color = "lightgray";
+            // previousImage arrow is disabled if first image is being displayed ("default" means disabled)
+            document.getElementById("previous").style.cursor = "default";
+        }
+        document.getElementById("imgLink").setAttribute("href", images[currentImage]);
+        document.getElementById("image").setAttribute("src", images[currentImage]);
+    }
+
+    // Called when sidebar window loads
+    function init() {
+        var unfilteredImages = JSON.parse(<?= images ?>);
+        document.getElementById("imgLink").setAttribute("href", unfilteredImages[0]);
+        document.getElementById("image").setAttribute("src", unfilteredImages[0]);
+
+        // Filters out images that do not exist
+        images = unfilteredImages.filter(function (item) { return item !== ""; });
+        if (images.length > 1) {
+            document.getElementById("next").setAttribute("onclick", "nextImage()");
+            document.getElementById("next").style.color = "black";
+            document.getElementById("next").style.cursor = "pointer";
+        }
+    }
+    window.onload = init;
+</script>
+
+</html>
