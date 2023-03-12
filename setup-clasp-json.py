@@ -1,6 +1,6 @@
 # Hey there! Are you trying to set up the development environment? See `docs/setup-dev-env.md`.
 
-# Copyright (c) 2022 FRC 1678 Citrus Circuits
+# Copyright (c) 2023 FRC 1678 Citrus Circuits
 
 import json
 import os.path

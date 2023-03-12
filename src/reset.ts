@@ -1,4 +1,4 @@
-// Copyright (c) 2022 FRC 1678 Citrus Circuits
+// Copyright (c) 2023 FRC 1678 Citrus Circuits
 
 /**
  * Resets the order of the teams based on the first pickability ratings.
@@ -29,12 +29,12 @@ function resetOrder() {
     );
     // Sort the teams by first pickability
     newRange.sort({ column: columnOfFirstPickability, ascending: false });
-    // Reset the order numbers
-    renumberOrder();
     // Clear the DNP list
     if (dnpsSheet.getLastRow() != 1) dnpsSheet.deleteRows(2, dnpsSheet.getLastRow() - 1);
     // Fix any missing formula cells in the main editor
     fixFormulas();
+    // Renumber the order numbers
+    renumberOrder();
     // Delete the last row because an extra empty row is made for some reason I still can't figure out why
     mainEditorSheet.deleteRow(mainEditorSheet.getLastRow() + 1);
 }
@@ -45,16 +45,12 @@ function resetOrder() {
 function fixFormulas() {
     var topLeftCorner = mainEditorSheet.getRange(4, 3, 1, 1);
     // Reset the formula in the cell in the top left corner
-    topLeftCorner.setValue(
-        "=VLOOKUP($A4, 'Team Raw Data'!$A$1:$ZZ$99, C$1, FALSE)"
-    );
+    topLeftCorner.setValue("=VLOOKUP($A4, 'Team Raw Data'!$A$1:$ZZ$99, C$1, FALSE)");
     var topRow = mainEditorSheet.getRange(4, 3, 1, mainEditorSheet.getLastColumn() - 2);
     // Copy the formulas to the right in the top row
-    topLeftCorner.copyTo(
-        topRow,
-        SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
-        false
-    );
+    topLeftCorner.copyTo(topRow, SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false);
+    // Set the special formula for the second pickability column
+    mainEditorSheet.getRange(4, 4, 1, 1).setValue("=IF(E4>F4,E4,F4)");
     var rangeToCopyTo = mainEditorSheet.getRange(
         4,
         3,
@@ -62,19 +58,13 @@ function fixFormulas() {
         mainEditorSheet.getLastColumn() - 2
     );
     // Copy the formulas down to the rest of the sheet
-    topRow.copyTo(
-        rangeToCopyTo,
-        SpreadsheetApp.CopyPasteType.PASTE_FORMULA,
-        false
-    );
+    topRow.copyTo(rangeToCopyTo, SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false);
     // Fix the conditional formatting rules that get messed up when copying formulas
     var rules = mainEditorSheet.getConditionalFormatRules();
     for (var i = 0; i < rules.length; i++) {
         if (rules[i].getRanges()[0].getA1Notation().startsWith("C")) {
             var newRule = rules[i].copy();
-            newRule.setRanges([
-                mainEditorSheet.getRange(4, 3, mainEditorSheet.getLastRow() - 3, 1),
-            ]);
+            newRule.setRanges([mainEditorSheet.getRange(4, 3, mainEditorSheet.getLastRow() - 3, 1)]);
             rules[i] = newRule;
             mainEditorSheet.setConditionalFormatRules(rules);
             break;

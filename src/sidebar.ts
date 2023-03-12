@@ -1,4 +1,4 @@
-// Copyright (c) 2022 FRC 1678 Citrus Circuits
+// Copyright (c) 2023 FRC 1678 Citrus Circuits
 
 /**
  * Taken from Google App Script HtmlService documentation
@@ -11,14 +11,14 @@ function include(file: string) {
     return HtmlService.createHtmlOutputFromFile(file).getContent();
 }
 
-function getTeamImages(team: string | number): string[] {
+function getTeamImages(team: string | number): string[] | null {
     // 'teamsRange' is the range containing team numbers (A1:A)
     var teamsRange = imagesSheet.getRange(1, 1, imagesSheet.getLastRow());
     var teamIndex = findTeam(team, teamsRange, 1);
-
-    return imagesSheet
-        .getRange(teamIndex, 2, 1, imagesSheet.getLastColumn())
-        .getValues()[0];
+    if (teamIndex === null) {
+        return null;
+    }
+    return imagesSheet.getRange(teamIndex, 2, 1, imagesSheet.getLastColumn()).getValues()[0];
 }
 
 function findTeam(
@@ -31,7 +31,7 @@ function findTeam(
 
     for (var i = 0; i < teams.length; i++) {
         if (teams[i][0] == team) {
-            // Adds 1 since Javascript arrays start at 0, while rows start at 1
+            // Adds 1 since JavaScript arrays start at 0, while rows start at 1
             // Adds another (firstRow-1) since teams starts at B(firstRow), not B1
             return i + firstRow;
         }
@@ -42,6 +42,9 @@ function findTeam(
 function getTeamName(team: string | number): string {
     var teamsRange = teamRawDataSheet.getRange(2, 1, teamRawDataSheet.getLastRow());
     var teamIndex = findTeam(team, teamsRange, 2);
+    if (teamIndex == null) {
+        return "";
+    }
     var teamNameColumn = 1;
     for (var i = 1; i <= teamRawDataSheet.getLastColumn(); i++) {
         if (teamRawDataSheet.getRange(1, i).getValue().toString() == "team_name") {
@@ -52,13 +55,18 @@ function getTeamName(team: string | number): string {
 }
 
 function showSidebar(teamNumber: string | number) {
+    // Check if sidebar is disabled in settings
+    if (settingsSheet.getRange("B2").getValue() != true) {
+        return;
+    }
+    var teamImages = getTeamImages(teamNumber);
+    if (teamImages === null) {
+        return;
+    }
     var html = HtmlService.createTemplateFromFile("sidebar_content");
     html.team_number = teamNumber;
     html.team_name = getTeamName(teamNumber);
-    html.images = JSON.stringify(getTeamImages(teamNumber));
-    var ui = html
-        .evaluate()
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setTitle(teamNumber.toString());
+    html.images = JSON.stringify(teamImages);
+    var ui = html.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME).setTitle(teamNumber.toString());
     SpreadsheetApp.getUi().showSidebar(ui);
 }

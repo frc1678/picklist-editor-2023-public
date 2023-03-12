@@ -1,4 +1,4 @@
-// Copyright (c) 2022 FRC 1678 Citrus Circuits
+// Copyright (c) 2023 FRC 1678 Citrus Circuits
 
 var ss = SpreadsheetApp.getActiveSpreadsheet();
 var mainEditorSheet = ss.getSheetByName("Main Editor");
@@ -11,15 +11,12 @@ var teamRawDataSheet = ss.getSheetByName("Team Raw Data");
  * Called when the spreadsheet is edited.
  * Determines what functionality should run depending on what part was edited.
  */
-function onEdit(event: any) {
+function main(event: any) {
     var eventRange: GoogleAppsScript.Spreadsheet.Range = event.range;
     var sheet = eventRange.getSheet();
-    var nextTeam: string | number = sheet
-        .getRange(eventRange.getRow() + 1, 1)
-        .getValue();
+    var nextTeam: string | number = sheet.getRange(eventRange.getRow() + 1, 1).getValue();
 
     switch (sheet.getSheetName()) {
-
         // Something in the Main Editor was edited
         case "Main Editor":
             // Make sure only one cell was edited
@@ -29,10 +26,8 @@ function onEdit(event: any) {
             // A team has been entered into the top left corner, so show the sidebar
             if (eventRange.getA1Notation() == "A3") {
                 var teamNumber: string | number = eventRange.getValue();
-                if (settingsSheet.getRange("B2").getValue() != true) {
-                    break;
-                }
                 showSidebar(teamNumber);
+                return;
             }
             // Quick sidebar (cell in column A is edited)
             else if (eventRange.getColumn() == 1 && eventRange.getRow() > 3) {
@@ -40,6 +35,7 @@ function onEdit(event: any) {
                 // Set the value in A3 to the team number
                 sheet.getRange("A3").setValue(teamNumber);
                 showSidebar(teamNumber);
+                return;
             }
             // Quick renumber without resorting (cell B3 is edited)
             else if (eventRange.getA1Notation() == "B3") {
@@ -66,8 +62,7 @@ function onEdit(event: any) {
                         renumberOrder();
                     }
                 }
-            }
-            else {
+            } else {
                 return;
             }
             break;
