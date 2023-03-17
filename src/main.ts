@@ -92,4 +92,5 @@ function main(event: any) {
     sheet.getRange("A3").setValue(nextTeam);
     // Shows sidebar of next team
     showSidebar(nextTeam);
+    updateGrosbeak(mainEditorSheet, dnpsSheet)
 }
