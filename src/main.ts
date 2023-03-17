@@ -74,6 +74,7 @@ function main(event: any) {
                 resetOrder();
             }
             settingsSheet.getRange("D2").setValue("FALSE");
+            updateGrosbeak(mainEditorSheet, dnpsSheet);
             return;
 
         // Something in the DNPs was edited
@@ -82,6 +83,7 @@ function main(event: any) {
             if (eventRange.getColumn() == 2) {
                 unDnp(eventRange);
             }
+            updateGrosbeak(mainEditorSheet, dnpsSheet);
             return;
 
         // There is nothing to be done for the edited sheet
@@ -92,5 +94,5 @@ function main(event: any) {
     sheet.getRange("A3").setValue(nextTeam);
     // Shows sidebar of next team
     showSidebar(nextTeam);
-    updateGrosbeak(mainEditorSheet, dnpsSheet)
+    updateGrosbeak(mainEditorSheet, dnpsSheet);
 }
