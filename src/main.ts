@@ -69,11 +69,23 @@ function main(event: any) {
 
         // Something in the Settings was edited
         case "Settings":
-            // The reset order button was clicked
-            if (eventRange.getA1Notation() == "D2") {
-                resetOrder();
+            switch (eventRange.getA1Notation()) {
+                case "D2":
+                    // The reset order button was clicked
+                    resetOrder();
+                    eventRange.setValue("FALSE");
+                    break;
+                case "B4":
+                    // The first pick mode button was clicked
+                    goToFirstPick();
+                    eventRange.setValue("FALSE");
+                    break;
+                case "C4":
+                    // The second pick mode button was clicked
+                    goToSecondPick();
+                    eventRange.setValue("FALSE");
+                    break;
             }
-            settingsSheet.getRange("D2").setValue("FALSE");
             updateGrosbeak(mainEditorSheet, dnpsSheet);
             return;
 
